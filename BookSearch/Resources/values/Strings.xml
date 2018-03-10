@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Book Search</string>
+  <string name="openCamera">Открыть камеру</string>
+  <string name="aboutprogram">О программе</string>
+  <string name="captioOProgram">Book Search</string>
+  <string name="description">Программа для поиска книг по фото в интернет</string>
+  <string name="developer">Разработчик\nТолбаев Егор</string>
+  <string name="communications">На связи\negor05.09.97@gmail.com</string>
+</resources>
