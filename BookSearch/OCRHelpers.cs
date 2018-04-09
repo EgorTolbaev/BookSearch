@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Com.Microsoft.Projectoxford.Vision;
 using Com.Microsoft.Projectoxford.Vision.Contract;
@@ -12,7 +11,8 @@ namespace BookSearch
     class OCRHelpers
     {
         private VisionServiceRestClient visionServiceClient;
-
+        
+        //строка подключение к API Microsoft OCR
         public OCRHelpers()
         {
             visionServiceClient = new VisionServiceRestClient("042d50eebc324e64afad1f3c70387b3c", "https://westcentralus.api.cognitive.microsoft.com/vision/v1.0");
@@ -23,7 +23,7 @@ namespace BookSearch
             List<string> list = new List<string>();
             try
             {
-                OCR ocr = visionServiceClient.RecognizeText(bitmap, LanguageCodes.English, true);
+                OCR ocr = visionServiceClient.RecognizeText(bitmap, LanguageCodes.AutoDetect, true);
                 string result = new Gson().ToJson(ocr);
 
                 OCRModel ocrModel = JsonConvert.DeserializeObject<OCRModel>(result);

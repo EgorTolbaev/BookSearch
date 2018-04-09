@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Graphics;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Provider;
 using Android.Views;
+using Android.Webkit;
 using Android.Widget;
-using Java.IO;
+using Java.Net;
 using Environment = Android.OS.Environment;
 using Uri = Android.Net.Uri;
 
-using System.Collections.Generic;
-using System.IO;
-using Com.Microsoft.Projectoxford.Vision;
-using Com.Microsoft.Projectoxford.Vision.Contract;
-using GoogleGson;
-using BookSearch.Model;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
 
 namespace BookSearch
 {
@@ -30,64 +25,153 @@ namespace BookSearch
         public static Java.IO.File _dir;
         public static Bitmap bitmap;
     }
-
-    [Activity(Label = "Book Search", MainLauncher = true)]
+    
+    [Activity(Label = "Book Search", MainLauncher = true, Icon = "@drawable/icon", Theme = "@android:style/Theme.NoTitleBar")]
     public class MainActivity : Activity
     {
         private ImageView _imageView;
+        public static List<string> listTextOutput;
+        ListView listView;
+        List<string> listText;
+        //флаг для определения нажатой кнопки
+        public bool ButtonFlag = false;
 
+        Button btnLoad;
+        public static StringBuilder sv;
+
+        //метод для возвращения результата
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-
-            // Делаем доступным в галерее
-
-            Intent mediaScanIntent = new Intent(Intent.ActionMediaScannerScanFile);
-            Uri contentUri = Uri.FromFile(App._file);
-            mediaScanIntent.SetData(contentUri);
-            SendBroadcast(mediaScanIntent);
-
-            /*
-             Отображаем в ImageView и изменяем размер растрового изображения что бы соответствовало
-             дисплею
-             Загрузка полноразмерного изображения будет потреблять много памяти и приведет к сбою
-             */
-
-            int height = Resources.DisplayMetrics.HeightPixels;
-            int width = _imageView.Height;
-            App.bitmap = App._file.Path.LoadAndResizeBitmap(width, height);
-            
-            if (App.bitmap != null)
+            //распознает по выбранному фото
+            if (ButtonFlag == true)
             {
-                Stream imageStream = BitmapHelpers.BitmapToStream(App.bitmap);
-                var task = new RecognizeTextTask(this).Execute(imageStream);
+
+                if (resultCode == Result.Ok)
+                {
+                    _imageView.SetImageURI(data.Data);
+
+                }
+
+                int height = Resources.DisplayMetrics.HeightPixels;
+                int width = _imageView.Height;
+                //App.bitmap = App._file.Path.LoadAndResizeBitmap(width, height);
+                _imageView.BuildDrawingCache(true);
+                App.bitmap = _imageView.GetDrawingCache(true);
+
+
+                if (App.bitmap != null)
+                {
+                    Stream imageStream = BitmapHelpers.BitmapToStream(App.bitmap);
+                    var task = new RecognizeTextTask(this).Execute(imageStream);
+
+                    _imageView.SetImageBitmap(App.bitmap);
+                    App.bitmap = null;
+                }
+
+                // Утилизируем растровое изображение на стороне Java
+                GC.Collect();
+
+
+                ButtonFlag = false;
                 
-                _imageView.SetImageBitmap(App.bitmap);
-                App.bitmap = null;
+            }//распознает по сделанному фото
+            else
+            {
+                // Делаем доступным в галерее
+                Intent mediaScanIntent = new Intent(Intent.ActionMediaScannerScanFile);
+                Uri contentUri = Uri.FromFile(App._file);
+                mediaScanIntent.SetData(contentUri);
+                SendBroadcast(mediaScanIntent);
+
+                /*
+                 Отображаем в ImageView и изменяем размер растрового изображения что бы соответствовало
+                 дисплею
+                 Загрузка полноразмерного изображения будет потреблять много памяти и приведет к сбою
+                 */
+
+                int height = Resources.DisplayMetrics.HeightPixels; //получение размера экрана
+                int width = _imageView.Height;
+                App.bitmap = App._file.Path.LoadAndResizeBitmap(width, height);
+                //App.bitmap = BitmapFactory.DecodeResource(Resources, Resource.Drawable.abc);
+
+                if (App.bitmap != null)
+                {
+                    Stream imageStream = BitmapHelpers.BitmapToStream(App.bitmap);
+                    var task = new RecognizeTextTask(this).Execute(imageStream);
+
+                    _imageView.SetImageBitmap(App.bitmap);
+                    App.bitmap = null;
+                }
+
+                // Утилизируем растровое изображение на стороне Java
+                GC.Collect();
             }
-            
-            // Утилизируем растровое изображение на стороне Java
-            GC.Collect();
         }
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-
             SetContentView(Resource.Layout.Main);
+
             if (IsThereAnAppToTakePictures())
             {
                 CreateDirectoryForPictures();
 
-                Button button = FindViewById<Button>(Resource.Id.myButton);
+                Button TakePhoto = FindViewById<Button>(Resource.Id.myButton);
                 _imageView = FindViewById<ImageView>(Resource.Id.imageView1);
-                button.Click += TakeAPicture;
-            }    
+
+                //кнопка сделать фото
+                TakePhoto.Click += TakeAPicture;
+                //кнопка вывода текста на экран
+                Button PrintText = FindViewById<Button>(Resource.Id.myButton1);
+                PrintText.Click += TextOutput;       
+                
+            }
+            //кнопка выбрать фото
+            var SelectPhoto = FindViewById<Button>(Resource.Id.button1);            
+            SelectPhoto.Click += delegate
+            {
+                var imageIntent = new Intent();
+                imageIntent.SetType("image/*");
+                imageIntent.SetAction(Intent.ActionGetContent);
+                StartActivityForResult(Intent.CreateChooser(imageIntent, "Select photo"), 0);
+                ButtonFlag = true;               
+            };
+            //переход на поиск activity SearchInternet
+            btnLoad = FindViewById<Button>(Resource.Id.btnLoad);
+            btnLoad.Click += (s, e) =>
+            {
+                Intent intent = new Intent(this, typeof(SearchInternet));
+                StartActivity(intent);
+            };
+        }
+        //вывод на экран
+        private void TextOutput(object sender, EventArgs e)
+        {
+            
+                if (listTextOutput.Count != 0)
+                {
+                    listText = new List<string>();
+                    listText = listTextOutput;
+                    listView = FindViewById<ListView>(Resource.Id.listView1);
+                    //привязка массива к списку
+                    ArrayAdapter<string> arrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, listText);
+                    listView.Adapter = arrayAdapter;
+
+                }
+                else
+                {
+                    Toast.MakeText(this, "Текст не распознан, возможно плохое качество фото", ToastLength.Long).Show();
+                }
+           
         }
 
+        //создание каталога для файлов
         private void CreateDirectoryForPictures()
         {
             App._dir = new Java.IO.File(
+                //доступ к хранилищу
                 Environment.GetExternalStoragePublicDirectory(
                     Environment.DirectoryPictures), "CameraAppDemo");
             if (!App._dir.Exists())
@@ -96,9 +180,11 @@ namespace BookSearch
             }
         }
 
+        //проверка на наличие камеры
         private bool IsThereAnAppToTakePictures()
         {
             Intent intent = new Intent(MediaStore.ActionImageCapture);
+            //извлекаем информацию о камере
             IList<ResolveInfo> availableActivities =
                 PackageManager.QueryIntentActivities(intent, PackageInfoFlags.MatchDefaultOnly);
             return availableActivities != null && availableActivities.Count > 0;
@@ -138,26 +224,41 @@ namespace BookSearch
             }
             return base.OnOptionsItemSelected(item);
         }
-
     }
 
 
-
+    //распознание текста
     internal class RecognizeTextTask : AsyncTask<Stream, string, string>
     {
         private MainActivity mainActivity;
+        //инициализация диалога
+        ProgressDialog mDialog = new ProgressDialog(Application.Context);
+        
 
         public RecognizeTextTask(MainActivity mainActivity)
         {
             this.mainActivity = mainActivity;
         }
 
+        //запуск в фоновом режиме
         protected override string RunInBackground(params Stream[] @params)
         {
             try
             {
+                
+                // выводим промежуточные результаты
+                PublishProgress("Recognizing...");
+                
                 OCRHelpers oCRHelpers = new OCRHelpers();
                 List<string> result = oCRHelpers.RecognizeText(@params[0]);
+                MainActivity.listTextOutput = result;
+
+                //передаем данные в одну переменную (динамическую строку)
+                StringBuilder sb = new StringBuilder();
+                foreach (string ch in MainActivity.listTextOutput)
+                    sb.Append(ch.ToString() + "+");
+                MainActivity.sv = sb;
+
                 return "";
             }
             catch (Java.Lang.Exception ex)
@@ -166,6 +267,23 @@ namespace BookSearch
             }
             
         }
+        //открывает диалог
+        protected override void OnPreExecute()
+        {
+            mDialog.Window.SetType(Android.Views.WindowManagerTypes.SystemAlert);
+            mDialog.Show();
+        }
+        //для вывода промежуточного результата
+        protected override void OnProgressUpdate(params string[] values)
+        {
+            mDialog.SetMessage(values[0]);
+        }
+        //закрываем диалог
+        protected override void OnPostExecute(string result)
+        {
+            mDialog.Dismiss(); 
+        }   
     }
+    
 }
 

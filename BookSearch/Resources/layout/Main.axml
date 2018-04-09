@@ -5,13 +5,39 @@
     android:layout_height="fill_parent">
     <ImageView
         android:src="@android:drawable/ic_menu_gallery"
-        android:layout_width="fill_parent"
-        android:layout_height="300.0dp"
+        android:layout_width="match_parent"
+        android:layout_height="100.0dp"
         android:id="@+id/imageView1"
-        android:adjustViewBounds="true" />
+        android:adjustViewBounds="true"
+        android:layout_marginBottom="0.0dp"
+        android:layout_marginTop="0.0dp" />
     <Button
         android:id="@+id/myButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/openCamera" />
+    <Button
+        android:text="@string/Gallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/button1" />
+    <Button
+        android:id="@+id/myButton1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Text" />
+    <Button
+        android:text="@string/Search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnLoad" />
+    <ListView
+        android:minWidth="25px"
+        android:minHeight="25px"
+        android:layout_width="match_parent"
+        android:layout_height="200.0dp"
+        android:id="@+id/listView1"
+        android:layout_marginTop="11.0dp"
+        android:layout_marginBottom="77.0dp"
+        android:layout_marginRight="1.0dp" />
 </LinearLayout>

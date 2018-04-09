@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!--MainActivity-->
   <string name="app_name">Book Search</string>
   <string name="openCamera">Открыть камеру</string>
-  <string name="aboutprogram">О программе</string>
+  <string name="Gallery">Выбор фото</string>
+  <string name="Text">Вывести текст</string>
+  <string name="Search">Поиск книги</string>
+  <!--активити OProgram-->
   <string name="captioOProgram">Book Search</string>
+  <string name="aboutprogram">О программе</string>
   <string name="description">Программа для поиска книг по фото в интернет</string>
   <string name="developer">Разработчик\nТолбаев Егор</string>
   <string name="communications">На связи\negor05.09.97@gmail.com</string>
+  <!--SearchInternet-->
+  <string name="Search1">Искать</string>
 </resources>

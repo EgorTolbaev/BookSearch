@@ -30,12 +30,13 @@ namespace BookSearch
 
             return resizedBitmap;
         }
-
+        //растровое изображение для потока
         public static Stream BitmapToStream(Bitmap bitmap)
         {
             byte[] data;
             using (var stream = new MemoryStream())
             {
+                //сжатие растрового изображения
                 bitmap.Compress(Bitmap.CompressFormat.Jpeg, 100, stream);
                 data = stream.ToArray();
             }
