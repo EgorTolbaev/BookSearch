@@ -26,17 +26,16 @@ namespace BookSearch
         public static Bitmap bitmap;
     }
     
-    [Activity(Label = "Book Search", MainLauncher = true, Icon = "@drawable/icon", Theme = "@android:style/Theme.NoTitleBar")]
+    [Activity(Label = "Book Search", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
         private ImageView _imageView;
         public static List<string> listTextOutput;
-        ListView listView;
-        List<string> listText;
+        public static ListView listView;
+        public static List<string> listText;
         //флаг для определения нажатой кнопки
-        public bool ButtonFlag = false;
+        public static bool ButtonFlag = false;
 
-        Button btnLoad;
         public static StringBuilder sv;
 
         //метод для возвращения результата
@@ -113,6 +112,8 @@ namespace BookSearch
         {
             base.OnCreate(bundle);
             SetContentView(Resource.Layout.Main);
+            this.RequestedOrientation = ScreenOrientation.Portrait;
+
 
             if (IsThereAnAppToTakePictures())
             {
@@ -122,11 +123,7 @@ namespace BookSearch
                 _imageView = FindViewById<ImageView>(Resource.Id.imageView1);
 
                 //кнопка сделать фото
-                TakePhoto.Click += TakeAPicture;
-                //кнопка вывода текста на экран
-                Button PrintText = FindViewById<Button>(Resource.Id.myButton1);
-                PrintText.Click += TextOutput;       
-                
+                TakePhoto.Click += TakeAPicture;  
             }
             //кнопка выбрать фото
             var SelectPhoto = FindViewById<Button>(Resource.Id.button1);            
@@ -136,35 +133,10 @@ namespace BookSearch
                 imageIntent.SetType("image/*");
                 imageIntent.SetAction(Intent.ActionGetContent);
                 StartActivityForResult(Intent.CreateChooser(imageIntent, "Select photo"), 0);
-                ButtonFlag = true;               
-            };
-            //переход на поиск activity SearchInternet
-            btnLoad = FindViewById<Button>(Resource.Id.btnLoad);
-            btnLoad.Click += (s, e) =>
-            {
-                Intent intent = new Intent(this, typeof(SearchInternet));
-                StartActivity(intent);
-            };
-        }
-        //вывод на экран
-        private void TextOutput(object sender, EventArgs e)
-        {
-            
-                if (listTextOutput.Count != 0)
-                {
-                    listText = new List<string>();
-                    listText = listTextOutput;
-                    listView = FindViewById<ListView>(Resource.Id.listView1);
-                    //привязка массива к списку
-                    ArrayAdapter<string> arrayAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, listText);
-                    listView.Adapter = arrayAdapter;
+                ButtonFlag = true;
 
-                }
-                else
-                {
-                    Toast.MakeText(this, "Текст не распознан, возможно плохое качество фото", ToastLength.Long).Show();
-                }
-           
+                _imageView.Visibility = ViewStates.Visible;
+            };
         }
 
         //создание каталога для файлов
@@ -195,12 +167,10 @@ namespace BookSearch
         {
             //захват изображения
             Intent intent = new Intent(MediaStore.ActionImageCapture);
-
             App._file = new Java.IO.File(App._dir, System.String.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
-
             intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
-
             StartActivityForResult(intent, 0);
+           // _imageView.Visibility = ViewStates.Visible;
         }
 
         //создаем меню
@@ -215,6 +185,7 @@ namespace BookSearch
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             int id = item.ItemId;
+            //Опрограмме
             if (id == Resource.Id.aboutprogram)
             {
                 Intent intent = new Intent(this, typeof(OProgram));
@@ -222,10 +193,53 @@ namespace BookSearch
 
                 return true;
             }
+            else
+            //Выбор фото
+            if (id == Resource.Id.SelectPhoto)
+            {
+                var imageIntent = new Intent();
+                imageIntent.SetType("image/*");
+                imageIntent.SetAction(Intent.ActionGetContent);
+                StartActivityForResult(Intent.CreateChooser(imageIntent, "Select photo"), 0);
+                ButtonFlag = true;
+
+              //  _imageView.Visibility = ViewStates.Visible;
+            }
+            else
+            //вывод на экран
+            if (id == Resource.Id.TextOutput)
+            {
+                if (listTextOutput.Count != 0)
+                {
+                    Intent intent = new Intent(this, typeof(TextOutput));
+                    StartActivity(intent);
+                }
+                else
+                {
+                    Toast.MakeText(this, "Текст не распознан, возможно плохое качество фото", ToastLength.Long).Show();
+                }
+
+            }
+            else
+            //переход на поиск activity SearchInternet
+            if (id == Resource.Id.Search)
+            {
+                Intent intent = new Intent(this, typeof(SearchInternet));
+                StartActivity(intent);
+            }
+            else
+            if (id == Resource.Id.openCamera)
+            {
+                //захват изображения
+                Intent intent = new Intent(MediaStore.ActionImageCapture);
+                App._file = new Java.IO.File(App._dir, System.String.Format("myPhoto_{0}.jpg", Guid.NewGuid()));
+                intent.PutExtra(MediaStore.ExtraOutput, Uri.FromFile(App._file));
+                StartActivityForResult(intent, 0);
+                _imageView.Visibility = ViewStates.Visible;
+            }
             return base.OnOptionsItemSelected(item);
         }
     }
-
 
     //распознание текста
     internal class RecognizeTextTask : AsyncTask<Stream, string, string>

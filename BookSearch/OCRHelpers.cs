@@ -15,7 +15,7 @@ namespace BookSearch
         //строка подключение к API Microsoft OCR
         public OCRHelpers()
         {
-            visionServiceClient = new VisionServiceRestClient("042d50eebc324e64afad1f3c70387b3c", "https://westcentralus.api.cognitive.microsoft.com/vision/v1.0");
+            visionServiceClient = new VisionServiceRestClient("bb82f299d1884cefa3ac2ce98a2a88b2", "https://westcentralus.api.cognitive.microsoft.com/vision/v1.0");
         }
 
         public  List<string> RecognizeText(Stream bitmap)

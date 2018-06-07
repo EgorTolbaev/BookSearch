@@ -1,9 +1,10 @@
 ﻿using Android.App;
+using Android.Content.PM;
 using Android.OS;
 
 namespace BookSearch
 {
-    [Activity(Label = "О программе", Theme = "@android:style/Theme.NoTitleBar")]
+    [Activity(Label = "О программе")]
     class OProgram : Activity
     {
         protected override void OnCreate(Bundle bundle)
@@ -11,6 +12,7 @@ namespace BookSearch
             base.OnCreate(bundle);
 
             SetContentView(Resource.Layout.OProgram);
+            this.RequestedOrientation = ScreenOrientation.Portrait;
         }
     }
 }

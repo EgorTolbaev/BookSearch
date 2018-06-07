@@ -4,11 +4,62 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minWidth="25px"
-    android:minHeight="25px">
+    android:minHeight="25px"
+    android:background="@android:color/background_light">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tableLayout1"
+        android:minWidth="25px"
+        android:minHeight="25px">
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:background="@android:color/background_light">
+            <RadioGroup
+                android:minWidth="25px"
+                android:minHeight="25px"
+                android:id="@+id/radioGroup1"
+                android:layout_column="0">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/Ozone"
+                    android:id="@+id/radioButton1"
+                    android:textColor="@android:color/background_dark" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Litres"
+                    android:id="@+id/radioButton2"
+                    android:textColor="@android:color/background_dark" />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Labirint"
+                    android:id="@+id/radioButton3"
+                    android:textColor="@android:color/background_dark" />
+            </RadioGroup>
+            <TextView
+                android:minWidth="30px"
+                android:minHeight="30px"
+                android:layout_column="1"
+                android:id="@+id/textView1" />
+            <CheckBox
+                android:text="@string/ShowSearchBa"
+                android:layout_column="2"
+                android:id="@+id/checkBox1"
+                android:textColor="@android:color/background_dark" />
+        </TableRow>
+    </TableLayout>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText1" />
+        android:id="@+id/editText1"
+        android:focusableInTouchMode="false"
+        android:focusable="false"
+        android:editable="false"
+        android:background="@android:color/background_light" />
     <android.webkit.WebView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

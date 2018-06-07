@@ -3,7 +3,8 @@
   <!--MainActivity-->
   <string name="app_name">Book Search</string>
   <string name="openCamera">Открыть камеру</string>
-  <string name="Gallery">Выбор фото</string>
+  <string name="Gallery">Выбрать фото</string>
+  <string name="Gallery1">Выбрать фото</string>
   <string name="Text">Вывести текст</string>
   <string name="Search">Поиск книги</string>
   <!--активити OProgram-->
@@ -14,4 +15,13 @@
   <string name="communications">На связи\negor05.09.97@gmail.com</string>
   <!--SearchInternet-->
   <string name="Search1">Искать</string>
+  <!--radioGroup-->
+  <string name="Ozone">Ozone</string>
+  <string name="Litres">Яндекс Книги</string>
+  <string name="Labirint">Google Книги</string>
+  
+  <string name="ShowSearchBa">Адрес страници</string>
+  
+  
+
 </resources>
